@@ -27,7 +27,7 @@ app.addHook('onRoute', (routeOptions) => {
 
 app.get('/', async () => ({ routes: allRoutes }));
 
-app.get('/health', async () => ({ status: 'ok' }));
+app.get('/health', async () => ({ status: 'ok', code: 200 }));
 
 app.register(radioRoutes);
 
