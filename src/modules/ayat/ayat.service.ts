@@ -4,36 +4,56 @@
  * MIT License
  */
 
-export interface AyaItem {
-    number: number;
-    text: string;
-}
+import type { ApiFunction, AlQuranAyatResponse } from '@/src/types/Api.js';
 
-export interface SurahWithAyat {
+export interface AyatItem {
     id: number;
-    name: string;
-    ayat: AyaItem[];
+    aya: string;
+    surahName: string;
+    numberInSurah: number;
+    surah: number;
+    apiName: 'alquran.cloud';
 }
 
-export async function fetchAllAyat(): Promise<SurahWithAyat[]> {
-    const surahRes = await fetch('https://api.alquran.cloud/v1/surah');
-    if (!surahRes.ok) throw new Error('Failed to fetch surahs');
-    const surahData = (await surahRes.json()).data as { number: number; name: string }[];
+export const ayatApis: ApiFunction<AyatItem>[] = [
+    async () => {
+        const res = await fetch('https://api.alquran.cloud/v1/quran/quran-uthmani');
+        if (!res.ok) throw new Error('API alquran.cloud failed');
 
-    const result: SurahWithAyat[] = [];
+        const json = (await res.json()) as AlQuranAyatResponse;
 
-    for (const s of surahData) {
-        const ayahRes = await fetch(`https://api.alquran.cloud/v1/surah/${s.number}`);
-        if (!ayahRes.ok) throw new Error(`Failed to fetch ayat for surah ${s.number}`);
-        const ayahJson = await ayahRes.json();
-        const ayahs = ayahJson.data.ayahs as { numberInSurah: number; text: string }[];
+        const surahs = json.data.surahs;
 
-        result.push({
-            id: s.number,
-            name: s.name,
-            ayat: ayahs.map((a) => ({ number: a.numberInSurah, text: a.text })),
-        });
+        return surahs.flatMap((surah) =>
+            surah.ayahs.map((a) => ({
+                id: a.number,
+                surahName: surah.name,
+                aya: a.text,
+                numberInSurah: a.numberInSurah,
+                surah: surah.number,
+                apiName: 'alquran.cloud',
+            })),
+        );
+    },
+];
+
+export async function fetchWithFallback<T>(apis: ApiFunction<T>[]): Promise<T[]> {
+    let lastError: Error | null = null;
+
+    for (const api of apis) {
+        try {
+            const result = await api();
+            if (result.length > 0) return result;
+        } catch (err) {
+            lastError = err instanceof Error ? err : new Error('Unknown error');
+        }
     }
 
-    return result;
+    if (lastError) throw lastError;
+    return [];
+}
+
+export async function getAyatContent(): Promise<{ ayat: AyatItem[] }> {
+    const ayat = await fetchWithFallback(ayatApis);
+    return { ayat };
 }
