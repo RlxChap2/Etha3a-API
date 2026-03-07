@@ -8,13 +8,13 @@ export type ApiFunction<T> = () => Promise<T[]>;
 
 /* ------------------ Reciters ------------------ */
 
-export interface Mp3QuranMoshaf {
+interface Mp3QuranMoshaf {
     id: number;
     name: string;
     server: string;
 }
 
-export interface Mp3QuranReciter {
+interface Mp3QuranReciter {
     id: number;
     name: string;
     date: string;
@@ -27,7 +27,7 @@ export interface Mp3QuranRecitersResponse {
 
 /* ------------------ Mp3Quran Surah ------------------ */
 
-export interface Mp3QuranSurah {
+interface Mp3QuranSurah {
     id: number;
     name: string;
     makkia: number;
@@ -39,7 +39,7 @@ export interface Mp3QuranSurahResponse {
 
 /* ------------------ AlQuran API ------------------ */
 
-export interface AlQuranSurah {
+interface AlQuranSurah {
     id: number;
     name: string;
     revelationType: string;
@@ -49,3 +49,18 @@ export interface AlQuranSurahResponse {
     data: AlQuranSurah[];
 }
 
+/* ------------------ AlQuran API ------------------ */
+
+export interface AlQuranAyatResponse {
+    data: {
+        surahs: {
+            number: number;
+            name: string;
+            ayahs: {
+                number: number;
+                text: string;
+                numberInSurah: number;
+            }[];
+        }[];
+    };
+}

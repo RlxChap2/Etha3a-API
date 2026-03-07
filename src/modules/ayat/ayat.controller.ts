@@ -5,11 +5,11 @@
  */
 
 import { FastifyReply, FastifyRequest } from 'fastify';
-import { fetchAllAyat } from './ayat.service.js';
+import { getAyatContent } from './ayat.service.js';
 
 export async function getAllAyat(req: FastifyRequest, reply: FastifyReply) {
     try {
-        const data = await fetchAllAyat();
+        const data = await getAyatContent();
         return reply.send({ success: true, data });
     } catch (err) {
         return reply.status(503).send({
@@ -19,17 +19,22 @@ export async function getAllAyat(req: FastifyRequest, reply: FastifyReply) {
     }
 }
 
-export async function getAyatBySurahId(req: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) {
-    try {
-        const data = await fetchAllAyat();
+export async function getAyatById(req: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) {
+    const id = parseInt(req.params.id);
 
-//find 
+    const data = await getAyatContent();
 
-        return reply.send({ success: true, data });
-    } catch (err) {
-        return reply.status(503).send({
+    const aya = data.ayat.find((a) => a.id === id);
+
+    if (!aya) {
+        return reply.status(404).send({
             success: false,
-            message: (err as Error).message || 'No APIs available',
+            message: 'Aya not found',
         });
     }
+
+    return reply.send({
+        success: true,
+        data: aya,
+    });
 }
