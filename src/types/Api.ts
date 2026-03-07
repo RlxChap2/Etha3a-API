@@ -48,3 +48,4 @@ export interface AlQuranSurah {
 export interface AlQuranSurahResponse {
     data: AlQuranSurah[];
 }
+
