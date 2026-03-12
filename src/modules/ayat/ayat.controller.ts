@@ -99,6 +99,7 @@ export async function getAyatBySurah(req: FastifyRequest<{ Params: { surah: stri
         },
     });
 }
+
 export async function getAyatByText(req: FastifyRequest<{ Querystring: { text: string } }>, reply: FastifyReply) {
     const text = req.query.text;
     if (!text) {

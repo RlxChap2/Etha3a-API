@@ -50,4 +50,9 @@ export enum AzkarEndpoints {
     evening = 2,
     sleep = 3,
     wakeup = 4,
+export interface SurahWithAyaItem {
+    number: number;
+    name: string;
+    ayat: AyaItem[];
+    apiName: 'alquran.cloud';
 }
